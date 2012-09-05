@@ -1,0 +1,17 @@
+s-computername
+s-ip
+s-port
+cs-method
+cs-uri-stem
+cs-uri-query
+sc-status
+sc-substatus
+sc-win32-status
+sc-bytes
+cs-bytes
+time-taken
+cs-version
+cs-host
+cs(User-Agent)
+cs(Cookie)
+cs(Referer)
