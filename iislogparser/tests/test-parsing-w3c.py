@@ -40,6 +40,7 @@ class TestParsingW3CFormat(unittest.TestCase):
         parser = W3CLogItemParser(fields)
         line = "BOBO"
         logItem = parser.parse(line)
+        print(logItem)
         self.assertEqual(logItem["cs_username"], line)
 
     def testParsingSiteName(self):
@@ -100,18 +101,18 @@ class TestParsingW3CFormat(unittest.TestCase):
         self.assertEqual(logItem["sc_status"], 200)
     
     def testParsingScSubStatus(self):
-        fields = "#Fields: sc-sub-status"
+        fields = "#Fields: sc-substatus"
         parser = W3CLogItemParser(fields)
         line = "0"
         logItem = parser.parse(line)
-        self.assertEqual(logItem["sc_sub_status"], 0)
+        self.assertEqual(logItem["sc_substatus"], 0)
 
     def testParsingNonIntSubStatus(self):
-        fields = "#Fields: sc-sub-status"
+        fields = "#Fields: sc-substatus"
         parser = W3CLogItemParser(fields)
         line = "-"
         logItem = parser.parse(line)
-        self.assertFalse("sc_sub_status" in logItem.keys())
+        self.assertFalse("sc_substatus" in logItem.keys())
 
     def testParsingScWin32Status(self):
         fields = "#Fields: sc-win32-status"
@@ -177,9 +178,9 @@ class TestParsingW3CFormat(unittest.TestCase):
         self.assertEqual(logItem["cs_referer"], line)
 
     def testParsingMultipleFields(self):
-        fields = "#Fields: cs-host time-taken"
+        fields = "#Fields: cs-version time-taken"
         parser = W3CLogItemParser(fields)
         line = "host 1234"
         logItem = parser.parse(line)
-        self.assertEqual(logItem["cs_host"], "host")
-        self.assertEqual(logItem["time_taken"], "1234")
+        self.assertEqual(logItem["cs_version"], "host")
+        self.assertEqual(logItem["time_taken"], 1234)
