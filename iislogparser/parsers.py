@@ -205,14 +205,15 @@ class W3CIISLogJsonConverter:
             with open(outfilename, "ab") as out:
                 for line in logfile:
                     linecount += 1
-                    if linecount > 4:
+                    #if linecount > 4:
+                    if not line.startswith("#"):
                         logitem = logItemParser.parse(line)
-                       # jsonEncoded = encoder.encode(logitem)+"\n"
+                        # jsonEncoded = encoder.encode(logitem)+"\n"
                         jsonEncoded = cjson.encode(logitem)+"\n"
                         #lines += jsonEncoded
                         out.write(jsonEncoded)
                         if linecount % 10000 == 0:
-                            lines = ""
+                        #    lines = ""
                             print(linecount)
                 #out.write(lines)
                         
