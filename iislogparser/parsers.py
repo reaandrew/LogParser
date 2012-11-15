@@ -7,7 +7,7 @@ import linecache
 class W3CLogItemParser:
 
     def __init__(self, fields):
-        self.items = fields[fields.find(": ")+2:].replace("\n","").split(" ")
+        self.items = fields.strip()[fields.find(": ")+2:].replace("\n","").split(" ")
 
         self.indexes = {}
         for item in self.items:
@@ -208,12 +208,8 @@ class W3CIISLogJsonConverter:
                     #if linecount > 4:
                     if not line.startswith("#"):
                         logitem = logItemParser.parse(line)
-                        # jsonEncoded = encoder.encode(logitem)+"\n"
                         jsonEncoded = cjson.encode(logitem)+"\n"
-                        #lines += jsonEncoded
                         out.write(jsonEncoded)
                         if linecount % 10000 == 0:
-                        #    lines = ""
                             print(linecount)
-                #out.write(lines)
                         
