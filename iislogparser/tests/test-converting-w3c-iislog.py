@@ -41,7 +41,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
         self.assertEquals(self.jsonObj["cs_method"], "GET")
 
     def testConvertsCsUriStemInJsonOutputFile(self):
-        self.assertEquals(self.jsonObj["cs_uri_stem"], "/en/zee_page.html")
+        self.assertEquals(self.jsonObj["cs_uri_stem"], '\/en\/zee_page.html')
 
     def testConvertCsUriQueryInJsonOutputFile(self):
         self.assertEquals(self.jsonObj["cs_uri_query"]["a"], "1")
@@ -58,7 +58,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
         self.assertEquals(self.jsonObj["c_ip"], "192.168.0.1")
 
     def testConvertsClientUserAgentInJsonOutputFile(self):
-        self.assertEquals(self.jsonObj["cs_user_agent"],"Mozilla/5.0+(iPad;+CPU+OS+5_1_1+like+Mac+OS+X)+AppleWebKit/534.46+(KHTML,+like+Gecko)+Version/5.1+Mobile/9B206+Safari/7534.48.3")
+        self.assertEquals(self.jsonObj["cs_user_agent"],"Mozilla\/5.0+(iPad;+CPU+OS+5_1_1+like+Mac+OS+X)+AppleWebKit\/534.46+(KHTML,+like+Gecko)+Version\/5.1+Mobile\/9B206+Safari\/7534.48.3")
 
     def testConvertsServerStatusInJsonOutputFile(self):
         self.assertEquals(self.jsonObj["sc_status"],200)

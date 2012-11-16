@@ -1,9 +1,17 @@
 from datetime import datetime
-import json
 import cjson
 import urlparse
-import linecache
 import glob
+import json
+import utilities
+import stopwatch
+import cStringIO
+
+class Filter:
+    
+    def __init__(self, method=None):
+        self.method = method
+
 
 class W3CLogItemParser:
 
@@ -25,8 +33,10 @@ class W3CLogItemParser:
         for item in self.items:
             index = self.indexes[item] 
             namereplacement = item.replace("-","_").replace("(","").replace(")","").lower()
-            logitem.update(getattr(self, "__add_"+namereplacement+"__")(lineitems, self.indexes[item]))
-
+            currentFunction = getattr(self, "__add_"+namereplacement+"__")
+            currentResult = currentFunction(lineitems, self.indexes[item])
+            logitem.update(currentResult)
+    
         return logitem
     
     def __add_date__(self, lineitems, index):
@@ -193,15 +203,27 @@ class W3CLogItemParser:
             output["cs_referer"] = lineitems[index]
         return output
 
+
 class W3CIISLogJsonConverter:
 
-    def convert(self, infilename, outfilename):
+    def __init__(self):
+        self.parsers = {}
 
+    def __get_log_item_parser__(self, fileReference):
+        fieldsLine = utilities.getLineStartingWith("#Fields", fileReference)
+        if(str(sorted(fieldsLine)) in self.parsers):
+            logItemParser = self.parsers[str(sorted(fieldsLine))]
+        else:
+            logItemParser = W3CLogItemParser(fieldsLine)
+            self.parsers[str(sorted(fieldsLine))] = logItemParser
+        return logItemParser
+
+    def convert(self, infilename, outfilename):
         linecount = 0
         lines = ""
-        fieldsLine = linecache.getline(infilename,4)
-        logItemParser = W3CLogItemParser(fieldsLine)
         with open(infilename, "rb") as logfile:
+            fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
+            logItemParser = W3CLogItemParser(fieldsLine)
             with open(outfilename, "ab") as out:
                 for line in logfile:
                     linecount += 1
@@ -213,43 +235,78 @@ class W3CIISLogJsonConverter:
                         if linecount % 10000 == 0:
                             print(linecount)
                         
-    def count_by_hour_multiple(self, files_pattern, outfilename):
+    def count_by_hour_multiple(self, file_pattern, outputpath, filter=None):
         linecount = 0
-        counts = {}
+        sums = {}
         serverips = []
-        with open(outfilename, "ab") as out:
-            for infilename in glob.glob(files_pattern):
-                serverip,result = self.count_by_hour(infilename)
-                if serverip not in serverips:
-                    serverips.append(serverip)
-                for key in result.keys():
-                    if key in counts:
-                        counts[key] += result[key]
-                    else:
-                        counts[key] = result[key]
+        dates = []
+        files = glob.glob(file_pattern)
+        for infilename in files:
+            print(infilename)
+            converter = W3CIISLogJsonConverter()
+            currentDates, currentServerIp, currentResult = converter.count_by_hour(infilename, filter)
 
-            for key in counts.keys():
-                counts[key] /= len(serverips)
+            if currentServerIp not in serverips:
+                serverips.append(currentServerIp)
+            for date in currentDates:
+                if not date in dates:
+                    dates.append(date)
 
-            jsonEncoded = cjson.encode(counts)
+            for key in currentResult.keys():
+                if key in sums:
+                    sums[key] += float(currentResult[key])
+                else:
+                    sums[key] = float(currentResult[key])
+                
+        for key in sums.keys():
+            sums[key] /= (len(dates) * len(serverips))
+
+        with open(outputpath, "ab") as out:
+            #jsonEncoded = cjson.encode(counts)
+            jsonEncoded = json.dumps(sums)
             out.write(jsonEncoded)
 
-    def count_by_hour(self, infilename):
+    def count_by_hour(self, infilename, filter=None):
         counts = {}
-        serverip = None
         linecount = 0
+        serverip = None
+        dates = []
         with open(infilename, "rb") as logfile:
-            fieldsLine = linecache.getline(infilename,4)
-            logItemParser = W3CLogItemParser(fieldsLine)
-            for line in logfile:
+            timer = stopwatch.Timer()
+            #logItemParser = self.__get_log_item_parser__(logfile)
+            fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
+            if(str(sorted(fieldsLine)) in self.parsers):
+                logItemParser = self.parsers[str(sorted(fieldsLine))]
+            else:
+                logItemParser = W3CLogItemParser(fieldsLine)
+                self.parsers[str(sorted(fieldsLine))] = logItemParser
+
+            buffer = cStringIO.StringIO(logfile.read())
+            for line in buffer:
                 linecount += 1
                 if not line.startswith("#"):
-                    logitem = logItemParser.parse(line)
+                    currentLogItem = logItemParser.parse(line)
+                    if filter != None \
+                        and filter.method != None \
+                        and currentLogItem["cs_method"] != filter.method:
+                        continue
+
                     if serverip == None:
-                        serverip = logitem["s_ip"]
-                    if not str(logitem["hour"]) in counts:
-                        counts[str(logitem["hour"])] = 0
+                        serverip = currentLogItem["s_ip"]
 
-                    counts[str(logitem["hour"])] += 1
+                    date = datetime(currentLogItem["year"],currentLogItem["month"],currentLogItem["day"])
 
-        return serverip,counts
+                    if not date in dates:
+                        dates.append(date)
+
+                    if not str(currentLogItem["hour"]) in counts:
+                        counts[str(currentLogItem["hour"])] = 0
+
+                    counts[str(currentLogItem["hour"])] += 1
+                if linecount % 10000 == 0:
+                    print(linecount)
+            buffer.close()
+
+        timer.stop()
+        print(timer.elapsed)
+        return dates, serverip, counts
