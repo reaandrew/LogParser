@@ -266,6 +266,12 @@ class W3CIISLogJsonConverter:
             jsonEncoded = json.dumps(sums)
             out.write(jsonEncoded)
 
+
+    def shouldSkipLine(self, currentLogItem, filter):
+        return filter != None \
+            and filter.method != None \
+            and currentLogItem["cs_method"] != filter.method
+
     def count_by_hour(self, infilename, filter=None):
         counts = {}
         linecount = 0
@@ -286,9 +292,8 @@ class W3CIISLogJsonConverter:
                 linecount += 1
                 if not line.startswith("#"):
                     currentLogItem = logItemParser.parse(line)
-                    if filter != None \
-                        and filter.method != None \
-                        and currentLogItem["cs_method"] != filter.method:
+
+                    if self.shouldSkipLine(currentLogItem, filter):
                         continue
 
                     if serverip == None:
