@@ -3,6 +3,7 @@ import json
 import cjson
 import urlparse
 import linecache
+import glob
 
 class W3CLogItemParser:
 
@@ -200,7 +201,6 @@ class W3CIISLogJsonConverter:
         lines = ""
         fieldsLine = linecache.getline(infilename,4)
         logItemParser = W3CLogItemParser(fieldsLine)
-        encoder = json.JSONEncoder(ensure_ascii=False)
         with open(infilename, "rb") as logfile:
             with open(outfilename, "ab") as out:
                 for line in logfile:
@@ -213,3 +213,43 @@ class W3CIISLogJsonConverter:
                         if linecount % 10000 == 0:
                             print(linecount)
                         
+    def count_by_hour_multiple(self, files_pattern, outfilename):
+        linecount = 0
+        counts = {}
+        serverips = []
+        with open(outfilename, "ab") as out:
+            for infilename in glob.glob(files_pattern):
+                serverip,result = self.count_by_hour(infilename)
+                if serverip not in serverips:
+                    serverips.append(serverip)
+                for key in result.keys():
+                    if key in counts:
+                        counts[key] += result[key]
+                    else:
+                        counts[key] = result[key]
+
+            for key in counts.keys():
+                counts[key] /= len(serverips)
+
+            jsonEncoded = cjson.encode(counts)
+            out.write(jsonEncoded)
+
+    def count_by_hour(self, infilename):
+        counts = {}
+        serverip = None
+        linecount = 0
+        with open(infilename, "rb") as logfile:
+            fieldsLine = linecache.getline(infilename,4)
+            logItemParser = W3CLogItemParser(fieldsLine)
+            for line in logfile:
+                linecount += 1
+                if not line.startswith("#"):
+                    logitem = logItemParser.parse(line)
+                    if serverip == None:
+                        serverip = logitem["s_ip"]
+                    if not str(logitem["hour"]) in counts:
+                        counts[str(logitem["hour"])] = 0
+
+                    counts[str(logitem["hour"])] += 1
+
+        return serverip,counts
