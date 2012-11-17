@@ -5,10 +5,8 @@ import json
 import utilities
 import stopwatch
 import cStringIO
+from utilities import ExtendedList
 
-class ExtendedList(list):
-    def addIfNotExists(self, item):
-        print("Hellooo")
 
 class Filter:
     
@@ -265,7 +263,7 @@ class W3CIISLogJsonConverter:
         counts = {}
         linecount = 0
         serverip = None
-        dates = []
+        dates = ExtendedList()
         with open(infilename, "rb") as logfile:
             timer = stopwatch.Timer()
             fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
@@ -284,9 +282,7 @@ class W3CIISLogJsonConverter:
                         serverip = currentLogItem["s_ip"]
 
                     date = datetime(currentLogItem["year"],currentLogItem["month"],currentLogItem["day"])
-                    
-                    if not date in dates:
-                        dates.append(date)
+                    dates.add_if_not_exists(date)
 
                     if not str(currentLogItem["hour"]) in counts:
                         counts[str(currentLogItem["hour"])] = 0
