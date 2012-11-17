@@ -7,6 +7,10 @@ import utilities
 import stopwatch
 import cStringIO
 
+class ExtendedList(list):
+    def addIfNotExists(self, item):
+        print("Hellooo")
+
 class Filter:
     
     def __init__(self, method=None):
@@ -206,18 +210,6 @@ class W3CLogItemParser:
 
 class W3CIISLogJsonConverter:
 
-    def __init__(self):
-        self.parsers = {}
-
-    def __get_log_item_parser__(self, fileReference):
-        fieldsLine = utilities.getLineStartingWith("#Fields", fileReference)
-        if(str(sorted(fieldsLine)) in self.parsers):
-            logItemParser = self.parsers[str(sorted(fieldsLine))]
-        else:
-            logItemParser = W3CLogItemParser(fieldsLine)
-            self.parsers[str(sorted(fieldsLine))] = logItemParser
-        return logItemParser
-
     def convert(self, infilename, outfilename):
         linecount = 0
         lines = ""
@@ -279,13 +271,8 @@ class W3CIISLogJsonConverter:
         dates = []
         with open(infilename, "rb") as logfile:
             timer = stopwatch.Timer()
-            #logItemParser = self.__get_log_item_parser__(logfile)
             fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
-            if(str(sorted(fieldsLine)) in self.parsers):
-                logItemParser = self.parsers[str(sorted(fieldsLine))]
-            else:
-                logItemParser = W3CLogItemParser(fieldsLine)
-                self.parsers[str(sorted(fieldsLine))] = logItemParser
+            logItemParser = W3CLogItemParser(fieldsLine)
 
             buffer = cStringIO.StringIO(logfile.read())
             for line in buffer:
@@ -300,7 +287,7 @@ class W3CIISLogJsonConverter:
                         serverip = currentLogItem["s_ip"]
 
                     date = datetime(currentLogItem["year"],currentLogItem["month"],currentLogItem["day"])
-
+                    
                     if not date in dates:
                         dates.append(date)
 
