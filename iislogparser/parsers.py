@@ -1,5 +1,4 @@
 from datetime import datetime
-import cjson
 import urlparse
 import glob
 import json
@@ -222,7 +221,7 @@ class W3CIISLogJsonConverter:
                     #if linecount > 4:
                     if not line.startswith("#"):
                         logitem = logItemParser.parse(line)
-                        jsonEncoded = cjson.encode(logitem)+"\n"
+                        jsonEncoded = json.dumps(logitem)+"\n"
                         out.write(jsonEncoded)
                         if linecount % 10000 == 0:
                             print(linecount)
@@ -254,10 +253,8 @@ class W3CIISLogJsonConverter:
             sums[key] /= (len(dates) * len(serverips))
 
         with open(outputpath, "ab") as out:
-            #jsonEncoded = cjson.encode(counts)
             jsonEncoded = json.dumps(sums)
             out.write(jsonEncoded)
-
 
     def shouldSkipLine(self, currentLogItem, filter):
         return filter != None \

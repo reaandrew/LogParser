@@ -10,3 +10,9 @@ def getLineStartingWith(linePrefix, file):
             break
 
     return None
+
+class ExtendedList(list):
+
+    def add_if_not_exists(self, item):
+        if item not in self:
+            self.append(item)
