@@ -207,6 +207,20 @@ class W3CLogItemParser:
 
 class W3CIISLogJsonConverter:
 
+    def __init__(self):
+        self.itemListeners = []
+
+    def enumerate_files(self, file_pattern, filter=None):
+        files = glob.glob(file_pattern)
+        for infilename in files:
+            with open(infilename, "rb") as logfile:
+                fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
+                logItemParser = W3CLogItemParser(fieldsLine)
+                for line in logfile:
+                    logitem = logItemParser.parse(line)
+                    for listener in self.itemListeners:
+                        listener.logitem(logitem)
+
     def convert(self, infilename, outfilename):
         linecount = 0
         lines = ""
@@ -265,6 +279,7 @@ class W3CIISLogJsonConverter:
         serverip = None
         dates = ExtendedList()
         with open(infilename, "rb") as logfile:
+            logfile.seek(0)
             timer = stopwatch.Timer()
             fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
             logItemParser = W3CLogItemParser(fieldsLine)

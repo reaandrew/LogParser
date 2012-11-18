@@ -45,6 +45,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
                     self.jsonObj = cjson.decode(fileData)
 
     def testGettingCountByHour(self):
+        print("JSONOBJ", self.jsonObj)
         self.assertEquals(self.jsonObj['12'], 1.5)
         self.assertEquals(self.jsonObj['13'], 1.5)
 
