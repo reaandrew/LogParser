@@ -5,7 +5,8 @@ import argparse
 import glob
 import os
 import cjson
-from parsers import Filter
+import stopwatch
+from reports import ByHourHitCounts
 
 def convert(args):
     for file in glob.glob(args.file):
@@ -16,10 +17,14 @@ def convert(args):
         converter.convert(filepath, outputpath)
 
 def count_by_hour(args):
-    print("triggered")
     outputpath = os.path.abspath(args.output)
     converter = W3CIISLogJsonConverter()
-    converter.count_by_hour_multiple(args.file, outputpath, filter=Filter(args.method))
+    by_hour_hit_count = ByHourHitCounts(outputpath)
+    converter.addListener(by_hour_hit_count)
+    timer = stopwatch.Timer()
+    converter.enumerate_files(args.file)
+    timer.stop()
+    print(timer.elapsed)
 
 functionlist = {
             'convert' : convert,
