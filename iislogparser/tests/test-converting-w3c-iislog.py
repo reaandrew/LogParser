@@ -3,6 +3,7 @@ import tempfile
 import cjson
 
 from iislogparser.parsers import W3CIISLogJsonConverter
+from iislogparser.reports import IISJsonWriter
 
 class TestConvertingW3CIISLog(unittest.TestCase):
 
@@ -18,9 +19,12 @@ class TestConvertingW3CIISLog(unittest.TestCase):
             tmp.seek(0)
             with tempfile.NamedTemporaryFile() as output:
                 converter = W3CIISLogJsonConverter()
-                print("Converting")
-                converter.convert(tmp.name, output.name)
-
+                iis_json_writer = IISJsonWriter(output.name)
+                converter.addListener(iis_json_writer)
+                #converter.convert(tmp.name, output.name)
+                converter.enumerate_files(tmp.name)
+                tmp.seek(0)
+    
                 fileData = output.file.read()
                 self.jsonObj = cjson.decode(fileData)
 

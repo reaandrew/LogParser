@@ -8,11 +8,15 @@ import cStringIO
 from utilities import ExtendedList
 
 
-class Filter:
+class MethodFilter:
     
-    def __init__(self, method=None):
+    def __init__(self, method):
         self.method = method
 
+    def should_skip(self, logitem):
+        return self.method != None \
+            and logitem["cs_method"] != self.method
+        
 
 class W3CLogItemParser:
 
@@ -213,10 +217,6 @@ class W3CIISLogJsonConverter:
     def addListener(self, listener):
         self.itemListeners.append(listener)
 
-    def __call_start__(self):
-        for listener in self.itemListeners:
-            listener.start()
-
     def __call_end__(self):
         for listener in self.itemListeners:
             listener.end()
@@ -226,7 +226,6 @@ class W3CIISLogJsonConverter:
             listener.logitem(logitem)
 
     def enumerate_files(self, file_pattern, filter=None):
-        self.__call_start__()
         files = glob.glob(file_pattern)
         for infilename in files:
             with open(infilename, "rb") as logfile:
