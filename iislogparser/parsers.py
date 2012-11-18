@@ -210,7 +210,23 @@ class W3CIISLogJsonConverter:
     def __init__(self):
         self.itemListeners = []
 
+    def addListener(self, listener):
+        self.itemListeners.append(listener)
+
+    def __call_start__(self):
+        for listener in self.itemListeners:
+            listener.start()
+
+    def __call_end__(self):
+        for listener in self.itemListeners:
+            listener.end()
+
+    def __call_log_item__(self, logitem):
+        for listener in self.itemListeners:
+            listener.logitem(logitem)
+
     def enumerate_files(self, file_pattern, filter=None):
+        self.__call_start__()
         files = glob.glob(file_pattern)
         for infilename in files:
             with open(infilename, "rb") as logfile:
@@ -218,8 +234,8 @@ class W3CIISLogJsonConverter:
                 logItemParser = W3CLogItemParser(fieldsLine)
                 for line in logfile:
                     logitem = logItemParser.parse(line)
-                    for listener in self.itemListeners:
-                        listener.logitem(logitem)
+                    self.__call_log_item__(logitem)
+        self.__call_end__()
 
     def convert(self, infilename, outfilename):
         linecount = 0
