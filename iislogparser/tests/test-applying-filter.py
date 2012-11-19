@@ -2,8 +2,8 @@ import unittest
 import tempfile
 import cjson
 import iislogparser.utilities
-from iislogparser.parsers import W3CIISLogJsonConverter
-from iislogparser.parsers import MethodFilter
+from iislogparser.parsers import W3CIISLogParser
+from iislogparser.filters import MethodFilter
 from iislogparser.reports import ByHourHitCounts
 
 
@@ -25,7 +25,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
             tmp.write(self.testContent)
             tmp.seek(0)
             with tempfile.NamedTemporaryFile() as output:
-                converter = W3CIISLogJsonConverter()
+                converter = W3CIISLogParser()
                 by_hour_hit_counts = ByHourHitCounts(output.name, [MethodFilter(method)])
                 #converter.count_by_hour_multiple(tmp.name, output.name, filter=Filter(method))
                 converter.addListener(by_hour_hit_counts)

@@ -7,17 +7,6 @@ import stopwatch
 import cStringIO
 from utilities import ExtendedList
 
-
-class MethodFilter:
-    
-    def __init__(self, method):
-        self.method = method
-
-    def should_skip(self, logitem):
-        return self.method != None \
-            and logitem["cs_method"] != self.method
-        
-
 class W3CLogItemParser:
 
     def __init__(self, fields):
@@ -209,7 +198,7 @@ class W3CLogItemParser:
         return output
 
 
-class W3CIISLogJsonConverter:
+class W3CIISLogParser:
 
     def __init__(self):
         self.itemListeners = []
@@ -236,92 +225,3 @@ class W3CIISLogJsonConverter:
                     self.__call_log_item__(logitem)
         self.__call_end__()
 
-    def convert(self, infilename, outfilename):
-        linecount = 0
-        lines = ""
-        with open(infilename, "rb") as logfile:
-            fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
-            logItemParser = W3CLogItemParser(fieldsLine)
-            with open(outfilename, "ab") as out:
-                for line in logfile:
-                    linecount += 1
-                    #if linecount > 4:
-                    if not line.startswith("#"):
-                        logitem = logItemParser.parse(line)
-                        jsonEncoded = json.dumps(logitem)+"\n"
-                        out.write(jsonEncoded)
-                        if linecount % 10000 == 0:
-                            print(linecount)
-                        
-    def count_by_hour_multiple(self, file_pattern, outputpath, filter=None):
-        linecount = 0
-        sums = {}
-        serverips = []
-        dates = []
-        files = glob.glob(file_pattern)
-        for infilename in files:
-            print(infilename)
-            converter = W3CIISLogJsonConverter()
-            currentDates, currentServerIp, currentResult = converter.count_by_hour(infilename, filter)
-
-            if currentServerIp not in serverips:
-                serverips.append(currentServerIp)
-            for date in currentDates:
-                if not date in dates:
-                    dates.append(date)
-
-            for key in currentResult.keys():
-                if key in sums:
-                    sums[key] += float(currentResult[key])
-                else:
-                    sums[key] = float(currentResult[key])
-                
-        for key in sums.keys():
-            sums[key] /= (len(dates) * len(serverips))
-
-        with open(outputpath, "ab") as out:
-            jsonEncoded = json.dumps(sums)
-            out.write(jsonEncoded)
-
-    def shouldSkipLine(self, currentLogItem, filter):
-        return filter != None \
-            and filter.method != None \
-            and currentLogItem["cs_method"] != filter.method
-
-    def count_by_hour(self, infilename, filter=None):
-        counts = {}
-        linecount = 0
-        serverip = None
-        dates = ExtendedList()
-        with open(infilename, "rb") as logfile:
-            logfile.seek(0)
-            timer = stopwatch.Timer()
-            fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
-            logItemParser = W3CLogItemParser(fieldsLine)
-
-            buffer = cStringIO.StringIO(logfile.read())
-            for line in buffer:
-                linecount += 1
-                if not line.startswith("#"):
-                    currentLogItem = logItemParser.parse(line)
-
-                    if self.shouldSkipLine(currentLogItem, filter):
-                        continue
-
-                    if serverip == None:
-                        serverip = currentLogItem["s_ip"]
-
-                    date = datetime(currentLogItem["year"],currentLogItem["month"],currentLogItem["day"])
-                    dates.add_if_not_exists(date)
-
-                    if not str(currentLogItem["hour"]) in counts:
-                        counts[str(currentLogItem["hour"])] = 0
-
-                    counts[str(currentLogItem["hour"])] += 1
-                if linecount % 10000 == 0:
-                    print(linecount)
-            buffer.close()
-
-        timer.stop()
-        print(timer.elapsed)
-        return dates, serverip, counts

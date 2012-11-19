@@ -2,7 +2,7 @@ import unittest
 import tempfile
 import cjson
 
-from iislogparser.parsers import W3CIISLogJsonConverter
+from iislogparser.parsers import W3CIISLogParser
 from iislogparser.reports import IISJsonWriter
 
 class TestConvertingW3CIISLog(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
             tmp.write(self.testContent)
             tmp.seek(0)
             with tempfile.NamedTemporaryFile() as output:
-                converter = W3CIISLogJsonConverter()
+                converter = W3CIISLogParser()
                 iis_json_writer = IISJsonWriter(output.name)
                 converter.addListener(iis_json_writer)
                 #converter.convert(tmp.name, output.name)

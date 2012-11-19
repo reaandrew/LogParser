@@ -3,7 +3,7 @@ import tempfile
 import cjson
 import os
 
-from iislogparser.parsers import W3CIISLogJsonConverter
+from iislogparser.parsers import W3CIISLogParser
 from iislogparser.reports import ByHourHitCounts
 
 class TestConvertingW3CIISLog(unittest.TestCase):
@@ -39,7 +39,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
                 tmp2.write(self.testContent2)
                 tmp2.seek(0)
                 with tempfile.NamedTemporaryFile() as output:
-                    converter = W3CIISLogJsonConverter()
+                    converter = W3CIISLogParser()
                     #converter.count_by_hour_multiple(os.path.dirname(tmp1.name)+"/*test.json", output.name)
                     by_hour_hit_counts = ByHourHitCounts(output.name)
                     converter.addListener(by_hour_hit_counts)
