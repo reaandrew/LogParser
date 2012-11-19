@@ -2,6 +2,7 @@ from datetime import datetime
 from utilities import ExtendedList
 import json
 
+
 class ByHourHitCounts:
 
     def __init__(self, output, filters=[]):
@@ -10,7 +11,6 @@ class ByHourHitCounts:
         self.serverips = ExtendedList()
         self.sums = {}
         self.filters = filters
-        self.count = 0;
     
     def logitem(self, logitem):
         if any([(filter.should_skip(logitem)) for filter in self.filters]):
@@ -23,9 +23,6 @@ class ByHourHitCounts:
         if not str(logitem["hour"]) in self.sums:
             self.sums[str(logitem["hour"])] = float(0)
         self.sums[str(logitem["hour"])] += 1
-        self.count += 1
-        if self.count % 10000 == 0:
-            print(self.count)
     
     def end(self):
         for key in self.sums.keys():
