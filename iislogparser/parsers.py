@@ -3,7 +3,6 @@ import urlparse
 import glob
 import json
 import utilities
-import stopwatch
 import cStringIO
 from utilities import ExtendedList
 
@@ -221,6 +220,8 @@ class W3CIISLogParser:
                 fieldsLine = utilities.getLineStartingWith("#Fields", logfile)
                 logItemParser = W3CLogItemParser(fieldsLine)
                 for line in logfile:
+                    if line.startswith("#"):
+                        continue
                     logitem = logItemParser.parse(line)
                     self.__call_log_item__(logitem)
         self.__call_end__()

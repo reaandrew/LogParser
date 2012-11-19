@@ -6,3 +6,4 @@ class MethodFilter:
     def should_skip(self, logitem):
         return self.method != None \
             and logitem["cs_method"] != self.method
+

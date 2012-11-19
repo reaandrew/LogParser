@@ -2,6 +2,36 @@ from datetime import datetime
 from utilities import ExtendedList
 import json
 
+class ByHourMaxHitCounts:
+
+    def __init__(self, output, filters=[]):
+        self.output = output
+        self.filters = filters
+        self.dates = {}
+
+    def logitem(self, logitem):
+        key = logitem["year"] + logitem["month"] + logitem["day"]
+        if key not in self.dates:
+            self.dates[key] = {}
+
+        if logitem["hour"] not in self.dates[key]:
+            self.dates[key][logitem["hour"]] = 0
+        self.dates[key][logitem["hour"]] += 1
+
+    def end(self):
+        returnObj = {}
+        for hour in range(0,24):
+            returnObj[hour] = 0
+            for key in self.dates.keys():
+                if hour in self.dates[key]:
+                    if self.dates[key][hour] > returnObj[hour]:
+                        returnObj[hour] = self.dates[key][hour]
+        self.__write_to__(self.output, returnObj)
+
+    def __write_to__(self, outputpath, obj):
+        with open(outputpath, "ab") as out:
+            jsonEncoded = json.dumps(obj, indent=4)
+            out.write(jsonEncoded)
 
 class ByHourHitCounts:
 
