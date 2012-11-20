@@ -1,0 +1,39 @@
+#!/usr/bin/python
+
+import argparse
+import glob
+import os
+import cjson
+from cStringIO import StringIO
+
+parser = argparse.ArgumentParser(description='(Restricted) JSON to CSV for key value data')
+
+parser.add_argument('file',  help='the file to convert')
+
+args = parser.parse_args()
+
+files = glob.glob(args.file)
+for infilename in files:
+    with open(infilename,"rb") as jsonfile:
+        fileData = jsonfile.read()
+        jsonObj = cjson.decode(fileData)
+        operatingDictionary = {}
+        out = StringIO()
+        datakeys = sorted(jsonObj)
+
+        for key in datakeys:
+            operatingDictionary[int(key)] = jsonObj[key]
+
+        out.write(",".join([("\""+str(x)+"\"") for x in operatingDictionary.keys()])+"\n")
+        val = ""
+        for key in datakeys:
+            val += "\"{0}\"".format(jsonObj[key])+","
+        val = val.rstrip(",")
+        out.write(val + "\n")
+        filename, path = os.path.splitext(os.path.abspath(infilename))
+        csvFilename = filename+".csv"
+        with open(csvFilename, "wb") as output:
+            output.write(out.getvalue())
+
+        out.close()
+

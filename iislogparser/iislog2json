@@ -1,30 +1,29 @@
 #!/usr/bin/python
 
-from parsers import W3CIISLogJsonConverter
+from parsers import W3CIISLogParser
 import argparse
 import glob
 import os
 import cjson
 import stopwatch
-from reports import ByHourHitCounts
+from reports import ByHourHitCounts, ByHourMaxHitCounts
+from filters import MethodFilter
+from outputs import JsonFileStream
+import console
 
 def convert(args):
     for file in glob.glob(args.file):
         filepath = os.path.abspath(file)
         outputpath = os.path.abspath(args.output)
-        print(filepath, outputpath)
-        converter = W3CIISLogJsonConverter()
+        converter = W3CIISLogParser()
         converter.convert(filepath, outputpath)
 
 def count_by_hour(args):
-    outputpath = os.path.abspath(args.output)
-    converter = W3CIISLogJsonConverter()
-    by_hour_hit_count = ByHourHitCounts(outputpath)
-    converter.addListener(by_hour_hit_count)
+    print("processing...")
     timer = stopwatch.Timer()
-    converter.enumerate_files(args.file)
+    console.count_by_hour(args)
     timer.stop()
-    print(timer.elapsed)
+    print("completed in : {0} seconds".format(timer.elapsed))
 
 functionlist = {
             'convert' : convert,
@@ -35,7 +34,7 @@ parser = argparse.ArgumentParser(description='Convert IIS Log in W3C Format into
 
 
 parser.add_argument('file',  help='The path to the file to convert.  filename or wildcard e.g. "*.log". Enclose the wildcard pattern in single or double quotes.')
-parser.add_argument('output',  help='The output file to write the converted log')
+parser.add_argument('-d','--outputdirectory',  help='The output directory to write the reports', default="./")
 parser.add_argument('function', help='The function to execute on the log files')
 parser.add_argument('--method', help='The http method by which to filter', default=None)
 

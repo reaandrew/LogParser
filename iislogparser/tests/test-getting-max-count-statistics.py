@@ -2,6 +2,7 @@ import unittest
 import tempfile
 from iislogparser.parsers import W3CIISLogParser
 from iislogparser.reports import ByHourMaxHitCounts
+from iislogparser.outputs import MemoryStream
 from mock import Mock
 import os
 import cjson
@@ -30,13 +31,11 @@ class TestEventsFromParser(unittest.TestCase):
         with tempfile.NamedTemporaryFile(suffix="test.json") as tmp:
             tmp.write(self.testContent1)
             tmp.seek(0)
-            with tempfile.NamedTemporaryFile() as output:
-                converter = W3CIISLogParser()
-                by_hour_counts = ByHourMaxHitCounts(output.name)
-                converter.addListener(by_hour_counts)
-                converter.enumerate_files(os.path.dirname(tmp.name)+"/*test.json")
-                fileData = output.file.read()
-                self.jsonObj = cjson.decode(fileData)
-                print(self.jsonObj)
-                self.assertEqual(self.jsonObj['12'], 5)
+            stream = MemoryStream()
+            converter = W3CIISLogParser()
+            by_hour_counts = ByHourMaxHitCounts(stream)
+            converter.addListener(by_hour_counts)
+            converter.enumerate_files(os.path.dirname(tmp.name)+"/*test.json")
+            self.obj = stream.read()
+            self.assertEqual(self.obj[12], 5)
 

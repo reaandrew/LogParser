@@ -5,6 +5,7 @@ import os
 
 from iislogparser.parsers import W3CIISLogParser
 from iislogparser.reports import ByHourHitCounts
+from iislogparser.outputs import MemoryStream
 
 class TestConvertingW3CIISLog(unittest.TestCase):
 
@@ -38,18 +39,14 @@ class TestConvertingW3CIISLog(unittest.TestCase):
                 tmp1.seek(0)
                 tmp2.write(self.testContent2)
                 tmp2.seek(0)
-                with tempfile.NamedTemporaryFile() as output:
-                    converter = W3CIISLogParser()
-                    #converter.count_by_hour_multiple(os.path.dirname(tmp1.name)+"/*test.json", output.name)
-                    by_hour_hit_counts = ByHourHitCounts(output.name)
-                    converter.addListener(by_hour_hit_counts)
-                    converter.enumerate_files(os.path.dirname(tmp1.name)+"/*test.json")
-                    fileData = output.file.read()
-                    print(fileData)
-                    self.jsonObj = cjson.decode(fileData)
+                stream = MemoryStream()
+                converter = W3CIISLogParser()
+                by_hour_hit_counts = ByHourHitCounts(stream)
+                converter.addListener(by_hour_hit_counts)
+                converter.enumerate_files(os.path.dirname(tmp1.name)+"/*test.json")
+                self.obj = stream.read()
 
     def testGettingCountByHour(self):
-        print("JSONOBJ", self.jsonObj)
-        self.assertEquals(self.jsonObj['12'], 1.5)
-        self.assertEquals(self.jsonObj['13'], 1.5)
+        self.assertEquals(self.obj['12'], 1.5)
+        self.assertEquals(self.obj['13'], 1.5)
 
