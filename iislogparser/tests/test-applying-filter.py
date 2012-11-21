@@ -47,7 +47,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
         self.assertEquals(2, self.obj["13"])
 
     def testApplyingUriStemPrefixFilter(self):
-        stemPrefixToFind = "/en/zee_page"
+        stemPrefixToFind = ["/en/zee_page"]
         filter = UriStemPrefixFilter(stemPrefixToFind, FilterMode.Exclude)
 
         with tempfile.NamedTemporaryFile() as tmp:

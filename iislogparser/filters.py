@@ -14,10 +14,10 @@ class MethodFilter:
 
 class UriStemPrefixFilter:
 
-    def __init__(self, prefix, mode = FilterMode.Exclude):
-        self.prefix = prefix
+    def __init__(self, prefixes, mode = FilterMode.Exclude):
+        self.prefixes = prefixes
         self.mode = mode
 
     def should_skip(self, logitem):
-        return self.mode != (self.prefix != None \
-            and logitem["cs_uri_stem"].startswith(self.prefix))
+        return self.mode != (self.prefixes != None \
+            and any ([(logitem["cs_uri_stem"].startswith(prefix)) for prefix in self.prefixes]))

@@ -16,8 +16,9 @@ class ByHourMaxHitCounts:
         self.dates = {}
 
     def logitem(self, logitem):
-        if any([(filter.should_skip(logitem)) for filter in self.filters]):
+        if any([( filter.should_skip(logitem)) for filter in self.filters]):
             return
+
         key = logitem["year"] + logitem["month"] + logitem["day"]
         if key not in self.dates:
             self.dates[key] = {}
@@ -60,7 +61,10 @@ class ByHourHitCounts:
     
     def end(self):
         for key in self.sums.keys():
-            self.sums[key] /= len(self.dates) * len(self.serverips)
+            if len(self.dates) == 0:
+                self.sums[key] = 0
+            else:
+                self.sums[key] /= len(self.dates) * len(self.serverips)
 
         self.output.write(self.sums)
 
