@@ -36,7 +36,7 @@ parser = argparse.ArgumentParser(description='Convert IIS Log in W3C Format into
 parser.add_argument('file',  help='The path to the file to convert.  filename or wildcard e.g. "*.log". Enclose the wildcard pattern in single or double quotes.')
 parser.add_argument('-d','--outputdirectory',  help='The output directory to write the reports', default="./")
 parser.add_argument('function', help='The function to execute on the log files')
-parser.add_argument('--method', help='The http method by which to filter', default=None)
+parser.add_argument('-m','--method', help='The http method by which to filter', default=None)
 parser.add_argument('--uI', help='The uri stem prefixes to include', default=[])
 parser.add_argument('--uE', help='The uri stem prefixes to exclude', default=[])
 

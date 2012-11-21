@@ -3,10 +3,22 @@ from utilities import ExtendedList
 import json
 import os
 
-class UniqueUriStem:
+class UniqueUriStems:
 
     def __init__(self, output, filters=[]):
-        pass
+        self.output = output
+        self.filters = filters
+        self.uniqueUris = []
+
+    def logitem(self, logitem):
+        if any([( filter.should_skip(logitem)) for filter in self.filters]):
+            return
+        stem = logitem["cs_uri_stem"] 
+        if stem not in self.uniqueUris:
+            self.uniqueUris.append(stem)
+
+    def end(self):
+        self.output.write(self.uniqueUris)
 
 class ByHourMaxHitCounts:
 
