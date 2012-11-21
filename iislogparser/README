@@ -1,1 +1,20 @@
 Some helpers for handling IIS Logs with JSON and some basic statistics
+
+Outstanding
+==================================================
+
+Tests for:
+    space in the uri filter command parameter text around commas
+
+Features:
+    SQL interface for filters
+    Publishing logitems to different transports (rabbitmq, UDP etc...)
+
+Ports:
+    c++
+    ruby
+    c#
+    node.js (with native module for parsing)
+
+    
+

@@ -25,9 +25,18 @@ def count_by_hour(args):
     timer.stop()
     print("completed in : {0} seconds".format(timer.elapsed))
 
+def unique_uri_stems(args):
+    print("processing...")
+    timer = stopwatch.Timer()
+    console.unique_uri_stems(args)
+    timer.stop()
+    print("completed in : {0} seconds".format(timer.elapsed))
+    
+
 functionlist = {
             'convert' : convert,
-            'countbyhour' : count_by_hour
+            'countbyhour' : count_by_hour,
+            'uniqueuristems': unique_uri_stems
         }
 
 parser = argparse.ArgumentParser(description='Convert IIS Log in W3C Format into JSON')
