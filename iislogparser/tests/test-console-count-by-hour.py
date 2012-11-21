@@ -23,9 +23,6 @@ class TestConvertingW3CIISLog(unittest.TestCase):
 2012-07-30 13:14:14 10.8.5.123 GET /en/zee_final_page.html a=1&b=2&c=3 80 Bongo 192.168.0.1 Mozilla/5.0+(iPad;+CPU+OS+5_1_1+like+Mac+OS+X)+AppleWebKit/534.46+(KHTML,+like+Gecko)+Version/5.1+Mobile/9B206+Safari/7534.48.3 200 1 2 858
 """
 
-    def tearDown(self):
-        print("Tear Down")
-
     def testGettingCountByHour(self):
         with tempfile.NamedTemporaryFile() as inputfile:
             inputfile.write(self.testContent)
@@ -40,7 +37,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
                 obj = cjson.decode(test.read())
             self.assertEquals(obj["12"], 1)
     
-    def testGettingCountByHourWithUriStemPrefixFilter(self):
+    def testGettingCountByHourWithUriStemPrefixFilterInclude(self):
         with tempfile.NamedTemporaryFile() as inputfile:
             inputfile.write(self.testContent)
             inputfile.seek(0)
@@ -56,3 +53,20 @@ class TestConvertingW3CIISLog(unittest.TestCase):
             print(obj)
             self.assertEquals(obj["13"], 2)
             self.assertEquals(obj["12"], 0)
+
+    def testGettingCountByHourWithUriStemPrefixFilterExclude(self):
+        with tempfile.NamedTemporaryFile() as inputfile:
+            inputfile.write(self.testContent)
+            inputfile.seek(0)
+            args = dotdict()
+            args.outputdirectory = tempfile.gettempdir() 
+            args.file = inputfile.name
+            args.uriStemPrefixesToExclude = "/en/zee_other,/en/zee_final"
+        
+            iislogparser.console.count_by_hour(args)
+            filename = os.path.join(args.outputdirectory, "maxbyhour.json")
+            with open(filename, "rb") as test:
+                obj = cjson.decode(test.read())
+            print(obj)
+            self.assertEquals(obj["13"], 1)
+            self.assertEquals(obj["12"], 1)

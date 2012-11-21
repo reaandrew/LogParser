@@ -21,6 +21,9 @@ def count_by_hour(args):
     if args.uriStemPrefixesToInclude != None and args.uriStemPrefixesToInclude.strip() != "":
         uriargs = args.uriStemPrefixesToInclude.split(",")
         parserFilters.append(UriStemPrefixFilter(uriargs, FilterMode.Include))
+    if args.uriStemPrefixesToExclude != None and args.uriStemPrefixesToExclude.strip() != "":
+        uriargs = args.uriStemPrefixesToExclude.split(",")
+        parserFilters.append(UriStemPrefixFilter(uriargs, FilterMode.Exclude))
 
     avg_hit_count = ByHourHitCounts(avgoutput, filters=parserFilters)
     max_hit_count = ByHourMaxHitCounts(maxoutput, filters=parserFilters)
