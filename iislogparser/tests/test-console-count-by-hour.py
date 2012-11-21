@@ -44,7 +44,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
             args = dotdict()
             args.outputdirectory = tempfile.gettempdir() 
             args.file = inputfile.name
-            args.uriStemPrefixesToInclude = "/en/zee_other,/en/zee_final"
+            args.uI = "/en/zee_other,/en/zee_final"
         
             iislogparser.console.count_by_hour(args)
             filename = os.path.join(args.outputdirectory, "maxbyhour.json")
@@ -61,7 +61,7 @@ class TestConvertingW3CIISLog(unittest.TestCase):
             args = dotdict()
             args.outputdirectory = tempfile.gettempdir() 
             args.file = inputfile.name
-            args.uriStemPrefixesToExclude = "/en/zee_other,/en/zee_final"
+            args.uE = "/en/zee_other,/en/zee_final"
         
             iislogparser.console.count_by_hour(args)
             filename = os.path.join(args.outputdirectory, "maxbyhour.json")

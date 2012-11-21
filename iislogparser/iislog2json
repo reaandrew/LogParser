@@ -37,6 +37,8 @@ parser.add_argument('file',  help='The path to the file to convert.  filename or
 parser.add_argument('-d','--outputdirectory',  help='The output directory to write the reports', default="./")
 parser.add_argument('function', help='The function to execute on the log files')
 parser.add_argument('--method', help='The http method by which to filter', default=None)
+parser.add_argument('--uI', help='The uri stem prefixes to include', default=[])
+parser.add_argument('--uE', help='The uri stem prefixes to exclude', default=[])
 
 args = parser.parse_args()
 
