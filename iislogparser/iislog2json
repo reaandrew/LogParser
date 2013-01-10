@@ -39,7 +39,7 @@ functionlist = {
             'uniqueuristems': unique_uri_stems
         }
 
-parser = argparse.ArgumentParser(description='Convert IIS Log in W3C Format into JSON')
+parser = argparse.ArgumentParser(description='Convert IIS Log in W3C Format into JSON example :iislog2json "**/*.log" output.json countbyhour --method "POST"')
 
 
 parser.add_argument('file',  help='The path to the file to convert.  filename or wildcard e.g. "*.log". Enclose the wildcard pattern in single or double quotes.')
@@ -54,6 +54,6 @@ args = parser.parse_args()
 if args.function == None or args.function.strip() == "" or not args.function in functionlist:
     convert(args)
 else:
-    functionlist[args.function](args)
+    functionlist[args.function](args)]
 
 
