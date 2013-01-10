@@ -1,0 +1,28 @@
+Some helpers for handling IIS Logs with JSON and some basic statistics
+
+The IIS LogParser does not seem to be able to aggregate data from multiple files, so this came about for that reason.  After that it was just used as a learning tool and continuing to be extended using the features of IIS Log Parser as a guide including the SQL Language interface.
+
+
+Outstanding
+==================================================
+
+Tests for:
+    space in the uri filter command parameter text around commas
+    Case sensitivity tests where applicable
+
+Features:
+    Multi processing to partition the work
+    Reports as command line arguments to allow multiple reports to be run
+    Publishing logitems to different transports (rabbitmq, UDP etc...)
+    Decouple the log format from the processing and have it configurable on the command line
+    Case sensitivity configuration by the command line
+    SQL interface for filters
+
+Ports:
+    c++
+    ruby
+    c#
+    node.js (with native module for parsing)
+
+    
+
