@@ -1,6 +1,6 @@
 Some helpers for handling IIS Logs with JSON and some basic statistics
 
-This is not trying to compete with the IIS LogParser.  The IIS LogParser does not seem to be able to aggregate data from multiple files, so this came about for that reason.  After that it was just used as a learning tool and continuing to be extended using the features of IIS Log Parser as a guide including the SQL Language interface.
+The IIS LogParser does not seem to be able to aggregate data from multiple files, so this came about for that reason.  After that it was just used as a learning tool and continuing to be extended using the features of IIS Log Parser as a guide including the SQL Language interface.
 
 
 Outstanding
